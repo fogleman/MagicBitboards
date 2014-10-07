@@ -1,3 +1,5 @@
+from math import log
+
 ROOK_DIRECTIONS = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 BISHOP_DIRECTIONS = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
 
@@ -73,53 +75,22 @@ def bishop_mapping(sq):
             if i & (1 << j):
                 bb |= 1 << bits[j]
         result[bb] = bishop_slide(sq, False, bb)
-        # bb_print(bb)
-        # bb_print(result[bb])
     return result
 
 ROOK_MAPPING = [rook_mapping(i) for i in range(64)]
 BISHOP_MAPPING = [bishop_mapping(i) for i in range(64)]
 
 def dump_map(x):
+    print '#define LENGTH %d' % len(x)
+    print '#define BITS %d' % (log(len(x)) / log(2))
+    print
     keys = ', '.join('0x%016x' % k for k in sorted(x))
     print 'bb KEYS[] = {%s};' % keys
     values = ', '.join('0x%016x' % x[k] for k in sorted(x))
     print 'bb VALUES[] = {%s};' % values
-    print 'int LENGTH = %d;' % len(x)
-
-def generate_tables():
-    # rook6
-    print '# rook6'
-    for i in range(64):
-        x = rook_slide(i, True)
-        print '0x%016x,' % x
-    # rook8
-    print '# rook8'
-    for i in range(64):
-        x = rook_slide(i, False)
-        print '0x%016x,' % x
-    # bishop6
-    print '# bishop6'
-    for i in range(64):
-        x = bishop_slide(i, True)
-        print '0x%016x,' % x
-    # bishop8
-    print '# bishop8'
-    for i in range(64):
-        x = bishop_slide(i, False)
-        print '0x%016x,' % x
-    # bits
-    for i in range(64):
-        x = rook_slide(i, True)
-        x = bishop_slide(i, True)
 
 def main():
     dump_map(ROOK_MAPPING[0])
-    return
-    for i in range(64):
-        print i, len(ROOK_MAPPING[i]), len(set(ROOK_MAPPING[i].values()))
-    for i in range(64):
-        print i, len(BISHOP_MAPPING[i]), len(set(BISHOP_MAPPING[i].values()))
 
 if __name__ == '__main__':
     main()
