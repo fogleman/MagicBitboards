@@ -20,8 +20,21 @@ def magic_search(mapping, bits_delta=0):
     model = Model()
     model.length = len(mapping)
     model.bits = int(log(model.length) / log(2)) - bits_delta
-    print model.length, model.bits
+    # print model.length, model.bits
     for i, (key, value) in enumerate(mapping.items()):
         model.keys[i] = key
         model.values[i] = value
-    return dll.magic_search(byref(model), 50, 10, 100000000)
+    return dll.magic_search(byref(model), 10, 1, 10000000)
+
+dll.magic_search_random.restype = c_ulonglong
+dll.magic_search_random.argtypes = [POINTER(Model)]
+
+def magic_search_random(mapping, bits_delta=0):
+    model = Model()
+    model.length = len(mapping)
+    model.bits = int(log(model.length) / log(2)) - bits_delta
+    # print model.length, model.bits
+    for i, (key, value) in enumerate(mapping.items()):
+        model.keys[i] = key
+        model.values[i] = value
+    return dll.magic_search_random(byref(model))

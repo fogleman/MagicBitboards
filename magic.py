@@ -90,9 +90,45 @@ def dump_map(x):
     values = ', '.join('0x%016x' % x[k] for k in sorted(x))
     print 'bb VALUES[] = {%s};' % values
 
-def main():
+def generate_lookup_tables():
+    from tables import *
+    mask = 0xffffffffffffffff
+    table = []
+    offsets = []
     for i in range(64):
-        magic = dll.magic_search(BISHOP_MAPPING[i])
+        sub = {}
+        for k, v in BISHOP_MAPPING[i].items():
+            x = ((k * MAGIC_BISHOP[i]) & mask) >> SHIFT_BISHOP[i]
+            sub[x] = v
+        sub = [sub.get(j, 0) for j in range(max(sub) + 1)]
+        offsets.append(len(table))
+        table.extend(sub)
+    # for x in table:
+    #     print '0x%016x,' % x
+    table = []
+    offsets = []
+    for i in range(64):
+        sub = {}
+        for k, v in ROOK_MAPPING[i].items():
+            x = ((k * MAGIC_ROOK[i]) & mask) >> SHIFT_ROOK[i]
+            sub[x] = v
+        sub = [sub.get(j, 0) for j in range(max(sub) + 1)]
+        offsets.append(len(table))
+        table.extend(sub)
+    # for x in table:
+    #     print '0x%016x,' % x
+
+def verify_tables():
+    pass
+
+def main():
+    generate_lookup_tables()
+    return
+    for i in range(64):
+        magic = dll.magic_search_random(BISHOP_MAPPING[i])
+        print '%2d, 0x%016x' % (i, magic)
+    for i in range(64):
+        magic = dll.magic_search_random(ROOK_MAPPING[i])
         print '%2d, 0x%016x' % (i, magic)
 
 if __name__ == '__main__':

@@ -83,19 +83,28 @@ bb magic_anneal(Model *model, double max_temp, double min_temp, int steps) {
     int energy = magic_energy(model, magic);
     int previous_energy = energy;
     int best_energy = energy;
+    int total = 0;
+    int jumps = 0;
     for (int step = 0; step < steps; step++) {
         double temp = max_temp * exp(factor * step / steps);
         bb undo = magic;
         magic ^= (bb)1 << rand_int(64);
         energy = magic_energy(model, magic);
         double change = energy - previous_energy;
+        total++;
         if (change > 0 && exp(-change / temp) < rand_double()) {
             magic = undo;
         }
         else {
+            if (change > 0) {
+                jumps++;
+            }
             previous_energy = energy;
             if (energy < best_energy) {
-                printf("t=%f, e=%d\n", temp, energy);
+                double pct = 100.0 * jumps / total;
+                printf("t=%f, e=%d, jumps=%.2f%%\n", temp, energy, pct);
+                total = 0;
+                jumps = 0;
                 best_energy = energy;
                 best = magic;
             }
@@ -113,6 +122,16 @@ bb magic_search(Model *model, double max_temp, double min_temp, int steps) {
         bb result = magic_anneal(model, max_temp, min_temp, steps);
         if (result) {
             return result;
+        }
+    }
+}
+
+bb magic_search_random(Model *model) {
+    srand(time(NULL));
+    while (1) {
+        bb magic = rand_magic() & rand_magic() & rand_magic();
+        if (magic_test(model, magic)) {
+            return magic;
         }
     }
 }
