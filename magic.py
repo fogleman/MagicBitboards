@@ -1,5 +1,8 @@
+from tables import *
+
 from math import log
 import dll
+import random
 
 ROOK_DIRECTIONS = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 BISHOP_DIRECTIONS = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
@@ -91,7 +94,6 @@ def dump_map(x):
     print 'bb VALUES[] = {%s};' % values
 
 def generate_lookup_tables():
-    from tables import *
     mask = 0xffffffffffffffff
     table = []
     offsets = []
@@ -118,11 +120,33 @@ def generate_lookup_tables():
     # for x in table:
     #     print '0x%016x,' % x
 
-def verify_tables():
-    pass
+def random_rook(sq):
+    bb = 0
+    for i in range(20):
+        bb |= 1 << random.randint(0, 63)
+    bb_print(bb)
+    bb &= ROOK6[sq]
+    bb *= MAGIC_ROOK[sq]
+    bb &= 0xffffffffffffffff
+    bb >>= SHIFT_ROOK[sq]
+    bb = ATTACK_ROOK[bb + OFFSET_ROOK[sq]]
+    bb_print(bb)
+
+def random_bishop(sq):
+    bb = 0
+    for i in range(20):
+        bb |= 1 << random.randint(0, 63)
+    bb_print(bb)
+    bb &= BISHOP6[sq]
+    bb *= MAGIC_BISHOP[sq]
+    bb &= 0xffffffffffffffff
+    bb >>= SHIFT_BISHOP[sq]
+    bb = ATTACK_BISHOP[bb + OFFSET_BISHOP[sq]]
+    bb_print(bb)
 
 def main():
-    generate_lookup_tables()
+    # generate_lookup_tables()
+    random_bishop(0)
     return
     for i in range(64):
         magic = dll.magic_search_random(BISHOP_MAPPING[i])
