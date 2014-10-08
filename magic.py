@@ -1,4 +1,5 @@
 from math import log
+import dll
 
 ROOK_DIRECTIONS = [(-1, 0), (1, 0), (0, -1), (0, 1)]
 BISHOP_DIRECTIONS = [(-1, -1), (-1, 1), (1, -1), (1, 1)]
@@ -90,7 +91,9 @@ def dump_map(x):
     print 'bb VALUES[] = {%s};' % values
 
 def main():
-    dump_map(ROOK_MAPPING[0])
+    for i in range(64):
+        magic = dll.magic_search(BISHOP_MAPPING[i])
+        print '%2d, 0x%016x' % (i, magic)
 
 if __name__ == '__main__':
     main()

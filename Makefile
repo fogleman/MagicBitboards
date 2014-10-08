@@ -1,4 +1,4 @@
-all: magic
+all: magic.so
 
-magic: magic.c
-	gcc -std=c99 -O3 -o magic magic.c
+magic.so: magic.c
+	gcc -std=c99 -O3 -shared -o magic.so magic.c
